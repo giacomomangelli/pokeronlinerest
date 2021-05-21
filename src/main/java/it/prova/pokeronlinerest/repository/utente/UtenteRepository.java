@@ -22,7 +22,7 @@ public interface UtenteRepository extends CrudRepository<Utente, Long>, CustomUt
 	List<Utente> findByCognomeIgnoreCaseContainingAndNomeIgnoreCaseContainingAndRuoli(String cognome, String nome,
 			Ruolo ruolo);
 	
-	@Query("select u from Utente u left join fetch u.ruoli r left join fetch u.tavooli t where u.id = ?1")
+	@Query("select u from Utente u left join fetch u.ruoli r left join fetch u.tavolo t where u.id = ?1")
 	Optional<Utente> findByIdEager(Long id);
 	
 	List<Utente> findByRuoliAndStato(Ruolo ruolo, StatoUtente stato);
