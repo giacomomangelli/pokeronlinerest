@@ -99,4 +99,18 @@ public class Utente {
 		return this.stato.equals(StatoUtente.ATTIVO);
 	}
 
+	public Utente(@NotBlank(message = "{nome.notblank}") String nome,
+			@NotBlank(message = "{cognome.notblank}") String cognome,
+			@NotBlank(message = "{username.notblank}") String username,
+			@NotBlank(message = "{password.notblank}") String password,
+			@NotNull(message = "{dataRegistrazione.notnull}") Date dataRegistrazione) {
+		super();
+		this.nome = nome;
+		this.cognome = cognome;
+		this.username = username;
+		this.password = password;
+		this.dataRegistrazione = dataRegistrazione;
+	}
+
+	
 }

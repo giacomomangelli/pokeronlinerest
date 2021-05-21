@@ -2,11 +2,8 @@ package it.prova.pokeronlinerest.service.tavolo;
 
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-
 import it.prova.pokeronlinerest.model.Tavolo;
 
-@Service
 public interface TavoloService {
 
 	public List<Tavolo> listAllTavoli();
@@ -21,6 +18,6 @@ public interface TavoloService {
 
 	public List<Tavolo> findByExample(Tavolo tavoloExemple);
 
-	public Tavolo caricaSingoloUtenteEager(Long id);
+	public Tavolo caricaSingoloTavoloEager(Long id);
 	
 }

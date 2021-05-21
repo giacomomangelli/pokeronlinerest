@@ -32,18 +32,18 @@ public class UtenteServiceImpl implements UtenteService {
 	}
 
 	@Transactional
-	public void aggiorna(Utente utenteInstance) {
-		repository.save(utenteInstance);
+	public Utente aggiorna(Utente utenteInstance) {
+		return repository.save(utenteInstance);
 	}
 
 	@Transactional
-	public void inserisci(Utente utenteInstance) {
+	public Utente inserisci(Utente utenteInstance) {
 		if (utenteInstance == null) {
 			throw new RuntimeException("Errore nell'inserimento dell'utente.");
 		}
 		utenteInstance.setDataRegistrazione(new Date());
 		utenteInstance.setStato(StatoUtente.ATTIVO);
-		repository.save(utenteInstance);
+		return repository.save(utenteInstance);
 	}
 
 	@Transactional

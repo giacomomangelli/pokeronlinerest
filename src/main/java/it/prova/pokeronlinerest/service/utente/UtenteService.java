@@ -11,9 +11,9 @@ public interface UtenteService {
 
 	public Utente caricaSingoloUtente(Long id);
 
-	public void aggiorna(Utente utenteInstance);
+	public Utente aggiorna(Utente utenteInstance);
 
-	public void inserisci(Utente utenteInstance);
+	public Utente inserisci(Utente utenteInstance);
 
 	public void rimuovi(Utente utenteInstance);
 
