@@ -72,6 +72,16 @@ public class PlayManagementController {
 		return utente.getEsperienzaAccumulata();
 	}
 
+	@GetMapping("/search")
+	public List<Tavolo> getTavoliWithExpMin(@RequestHeader("Authorization") String message, @RequestBody Tavolo tavoloExample){
+		Utente utente = utenteServiceInstance.findByUserName(message);
+		if(utente == null || !utente.isAttivo()) {
+			throw new UtenteNotAuthorizedException("utente not authorized with username: " + message);
+		}
+		tavoloExample.setEsperienzaMin(utente.getEsperienzaAccumulata());
+		return tavoloServiceInstance.findByExample(tavoloExample);
+	}
+	
 	@PutMapping("/gioca")
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity<String> playGame(@RequestHeader("Authorization") String message, @RequestBody Long id) {
@@ -83,17 +93,20 @@ public class PlayManagementController {
 			throw new CreditInvalidException("Il credito non e' sufficiente a giocare la partita!");
 		}
 		
+		Double segno = Math.random();
+		
+		if(segno >=0.5 ) {
+			segno=1D;
+		}else {
+			segno=-1D;
+		}
+		Double somma = (double) (Math.random()*1000);
+		Double totale = segno*somma;	
+		if(totale>=0) {
+			
+		}else {
+			
+		}
 		return ResponseEntity.status(null).body(null);
-	}
-	
-	@GetMapping("/search")
-	public List<Tavolo> getTavoliWithExpMin(@RequestHeader("Authorization") String message, @RequestBody Tavolo tavoloExample){
-		Utente utente = utenteServiceInstance.findByUserName(message);
-//		if(utente.isAdmin()) {
-//			return tavoloServiceInstance.findByExample(tavoloExample);
-//		}
-//		CheckUtenteAuthorization.checkAthorizationOfSpecialPlayerWithTable(message, utente, tavoloExample);
-		tavoloExample.setEsperienzaMin(utente.getEsperienzaAccumulata());
-		return tavoloServiceInstance.findByExample(tavoloExample);
 	}
 }
