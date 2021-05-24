@@ -3,6 +3,7 @@ package it.prova.pokeronlinerest.service.tavolo;
 import java.util.List;
 
 import it.prova.pokeronlinerest.model.Tavolo;
+import it.prova.pokeronlinerest.model.Utente;
 
 public interface TavoloService {
 
@@ -19,5 +20,9 @@ public interface TavoloService {
 	public List<Tavolo> findByExample(Tavolo tavoloExemple);
 
 	public Tavolo caricaSingoloTavoloEager(Long id);
+	
+	public Tavolo caricaTavoloByAuthorization(Utente utente, Long idTavolo);
+	
+	public Tavolo caricaTavoloByUtenteCreazione(Long id, Utente utente);
 	
 }

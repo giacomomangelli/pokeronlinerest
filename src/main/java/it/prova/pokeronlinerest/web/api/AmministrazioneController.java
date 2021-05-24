@@ -1,5 +1,6 @@
 package it.prova.pokeronlinerest.web.api;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -12,28 +13,33 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import it.prova.pokeronlinerest.model.StatoUtente;
 import it.prova.pokeronlinerest.model.Utente;
 import it.prova.pokeronlinerest.service.utente.UtenteService;
+import it.prova.pokeronlinerest.utility.CheckUtenteAuthorization;
 import it.prova.pokeronlinerest.web.api.exception.UtenteNotFoundException;
 
 @RestController
-@RequestMapping("api/utente")
+@RequestMapping("api/amministrazione")
 public class AmministrazioneController {
 
 	@Autowired
 	private UtenteService utenteServiceInstance;
 
 	@GetMapping
-	public List<Utente> listAll() {
+	public List<Utente> listAll(@RequestHeader ("Authorization") String message) {
+		CheckUtenteAuthorization.checkAuthorizationAdmin(message, utenteServiceInstance.findByUserName(message));
 		return utenteServiceInstance.listAllUtenti();
 	}
 
 	@GetMapping("/{id}")
-	public Utente findById(@PathVariable(value = "id", required = true) Long id) {
+	public Utente findById(@PathVariable(value = "id", required = true) Long id, @RequestHeader ("Authorization") String message) {
+		CheckUtenteAuthorization.checkAuthorizationAdmin(message, utenteServiceInstance.findByUserName(message));
 		Utente utente = utenteServiceInstance.caricaSingoloUtenteEager(id);
 		if (utente == null) {
 			throw new UtenteNotFoundException("Utente not found with id: " + id);
@@ -43,13 +49,18 @@ public class AmministrazioneController {
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public Utente createNewUtente(@Valid @RequestBody Utente utenteInstance) {
+	public Utente createNewUtente(@Valid @RequestBody Utente utenteInstance, @RequestHeader ("Authorization") String message) {
+		CheckUtenteAuthorization.checkAuthorizationAdmin(message, utenteServiceInstance.findByUserName(message));
+		utenteInstance.setDataRegistrazione(new Date());
+		utenteInstance.setStato(StatoUtente.ATTIVO);;
 		return utenteServiceInstance.inserisci(utenteInstance);
 	}
 
 	@PutMapping("/{id}")
 	public Utente updateUtente(@PathVariable(value = "id", required = true) Long id,
-			@Valid @RequestBody Utente utenteInstance) {
+			@Valid @RequestBody Utente utenteInstance, @RequestHeader ("Authorization") String message) {
+
+		CheckUtenteAuthorization.checkAuthorizationAdmin(message, utenteServiceInstance.findByUserName(message));
 		Utente utente = utenteServiceInstance.caricaSingoloUtenteEager(id);
 		if (utente == null) {
 			throw new UtenteNotFoundException("Utente not found with id: " + id);
@@ -61,16 +72,18 @@ public class AmministrazioneController {
 
 	@DeleteMapping("/{id}")
 	@ResponseStatus(HttpStatus.OK)
-	public void deleteUtente(@PathVariable(value = "id", required = true) Long id) {
+	public void deleteUtente(@PathVariable(value = "id", required = true) Long id, @RequestHeader ("Authorization") String message) {
+		CheckUtenteAuthorization.checkAuthorizationAdmin(message, utenteServiceInstance.findByUserName(message));
 		Utente utente = utenteServiceInstance.caricaSingoloUtente(id);
 		if (utente == null) {
 			throw new UtenteNotFoundException("Utente not found with id: " + id);
 		}
-		utenteServiceInstance.rimuovi(utente);
+		utenteServiceInstance.invertUserAbilitation(utente.getId());
 	}
 
 	@PostMapping("/search")
-	public List<Utente> searchUtente(Utente utenteExample) {
+	public List<Utente> searchUtente(Utente utenteExample, @RequestHeader ("Authorization") String message) {
+		CheckUtenteAuthorization.checkAuthorizationAdmin(message, utenteServiceInstance.findByUserName(message));
 		return utenteServiceInstance.findByExample(utenteExample);
 	}
 

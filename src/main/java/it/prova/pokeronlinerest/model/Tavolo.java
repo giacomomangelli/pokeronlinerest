@@ -27,12 +27,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name = "tavolo")
-@Data 
-@Getter @Setter @AllArgsConstructor @NoArgsConstructor
+@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Tavolo {
 
 	@Id
@@ -58,14 +60,14 @@ public class Tavolo {
 	@Column(name = "data_creazione")
 	private Date dataCreazione;
 
-	@JsonIgnoreProperties(value= {"tavolo"})
+	@JsonIgnoreProperties(value = { "tavolo" })
 	@NotNull(message = "{utenteCreazione.notnull}")
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "utente_creazione_id")
 	private Utente utenteCreazione;
 
-	@JsonIgnoreProperties(value= {"tavolo"})
+	@JsonIgnoreProperties(value = { "tavolo" })
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "tavolo")
 	private Set<Utente> utenti = new HashSet<>(0);
-	
+
 }

@@ -35,7 +35,7 @@ public class CustomTavoloRepositoryImpl implements CustomTavoloRepository {
 			parameterMap.put("cifraMinima", exampleInstance.getCifraMinima());
 		}
 		if (exampleInstance.getEsperienzaMin()!=null && exampleInstance.getEsperienzaMin() >= 0) {
-			whereClauses.add(" t.esperienzaMin >= :esperienzaMin ");
+			whereClauses.add(" t.esperienzaMin <= :esperienzaMin ");
 			parameterMap.put("esperienzaMin", exampleInstance.getEsperienzaMin());
 		}
 		if (exampleInstance.getUtenti() != null && !exampleInstance.getUtenti().isEmpty()) {

@@ -12,6 +12,7 @@ import it.prova.pokeronlinerest.model.StatoUtente;
 import it.prova.pokeronlinerest.model.Utente;
 import it.prova.pokeronlinerest.repository.utente.UtenteRepository;
 import it.prova.pokeronlinerest.service.ruolo.RuoloService;
+import it.prova.pokeronlinerest.web.api.exception.UtenteNotFoundException;
 
 @Service
 public class UtenteServiceImpl implements UtenteService {
@@ -68,7 +69,7 @@ public class UtenteServiceImpl implements UtenteService {
 		}
 		Utente utenteInstance = caricaSingoloUtente(utenteInstanceId);
 		if (utenteInstance == null) {
-			throw new RuntimeException("Elemento non trovato.");
+			throw new UtenteNotFoundException("Utente not found with id: " + utenteInstanceId);
 		}
 		if (utenteInstance.isAdmin() && repository
 				.findByRuoliAndStato(ruoloService.cercaPerDescrizioneECodice("Administrator", "ROLE_ADMIN"),
