@@ -18,6 +18,7 @@ import it.prova.pokeronlinerest.model.Utente;
 import it.prova.pokeronlinerest.service.tavolo.TavoloService;
 import it.prova.pokeronlinerest.service.utente.UtenteService;
 import it.prova.pokeronlinerest.web.api.exception.CreditInvalidException;
+import it.prova.pokeronlinerest.web.api.exception.ExperienceInvalidException;
 import it.prova.pokeronlinerest.web.api.exception.TavoloNotFoundException;
 import it.prova.pokeronlinerest.web.api.exception.UtenteNotAuthorizedException;
 
@@ -60,53 +61,78 @@ public class PlayManagementController {
 	@ResponseStatus(HttpStatus.OK)
 	public Double quitGame(@RequestHeader("Authorization") String message) {
 		Utente utente = utenteServiceInstance.findByUserName(message);
-		if(utente == null || !utente.isAttivo()) {
+		if (utente == null || !utente.isAttivo()) {
 			throw new UtenteNotAuthorizedException("utente not authorized with username: " + message);
 		}
-		if(utente.getTavolo()==null) {
+		if (utente.getTavolo() == null) {
 			throw new TavoloNotFoundException("Nessun tavolo attivo per utente con id: " + message);
 		}
 		utente.setTavolo(null);
-		utente.setEsperienzaAccumulata(utente.getEsperienzaAccumulata()+1);
+		utente.setEsperienzaAccumulata(utente.getEsperienzaAccumulata() + 1);
 		utenteServiceInstance.aggiorna(utente);
 		return utente.getEsperienzaAccumulata();
 	}
 
 	@GetMapping("/search")
-	public List<Tavolo> getTavoliWithExpMin(@RequestHeader("Authorization") String message, @RequestBody Tavolo tavoloExample){
+	public List<Tavolo> getTavoliWithExpMin(@RequestHeader("Authorization") String message,
+			@RequestBody Tavolo tavoloExample) {
 		Utente utente = utenteServiceInstance.findByUserName(message);
-		if(utente == null || !utente.isAttivo()) {
+		if (utente == null || !utente.isAttivo()) {
 			throw new UtenteNotAuthorizedException("utente not authorized with username: " + message);
 		}
 		tavoloExample.setEsperienzaMin(utente.getEsperienzaAccumulata());
 		return tavoloServiceInstance.findByExample(tavoloExample);
 	}
-	
+
 	@PutMapping("/gioca")
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity<String> playGame(@RequestHeader("Authorization") String message, @RequestBody Long id) {
 		Utente utente = utenteServiceInstance.findByUserName(message);
-		if(utente == null || !utente.isAttivo()) {
+		if (utente == null || !utente.isAttivo()) {
 			throw new UtenteNotAuthorizedException("utente not authorized with username: " + message);
 		}
-		if(utente.getCreditoAccumulato()<10) {
+		Tavolo tavolo = tavoloServiceInstance.caricaSingoloTavoloEager(id);
+		if (tavolo == null) {
+			throw new TavoloNotFoundException("Tavolo not found con id: " + id);
+		}
+		if (utente.getEsperienzaAccumulata() < tavolo.getEsperienzaMin()) {
+			throw new ExperienceInvalidException("L'esperienza non e' sufficiente a giocare la partita!");
+		}
+		if (utente.getCreditoAccumulato() < tavolo.getCifraMinima()) {
+			utente.setTavolo(null);
+			utenteServiceInstance.aggiorna(utente);
 			throw new CreditInvalidException("Il credito non e' sufficiente a giocare la partita!");
 		}
-		
+
+		String result = "La partita è stata ";
 		Double segno = Math.random();
+
+		if (segno >= 0.5) {
+			segno = 1D;
+		} else {
+			segno = -1D;
+		}
+		Double somma = (double) (Math.random() * 1000);
+		Double totale = segno * somma;
+		if (totale >= 0) {
+			result += "vinta.";
+		} else {
+			result += "persa.";
+		}
+
+		utente.setCreditoAccumulato(utente.getCreditoAccumulato() + totale);
+
+		if(utente.getCreditoAccumulato()<0) {
+			utente.setTavolo(null);
+			utente.setCreditoAccumulato(0.0);
+			utente.setEsperienzaAccumulata(utente.getEsperienzaAccumulata() + 1);
+			utenteServiceInstance.aggiorna(utente);	
+			return ResponseEntity.status(HttpStatus.OK)
+					.body(result + " Il credito residuo è pari a: " + utente.getCreditoAccumulato() + ". Sei stato rimosso dal tavolo.");
+		}
 		
-		if(segno >=0.5 ) {
-			segno=1D;
-		}else {
-			segno=-1D;
-		}
-		Double somma = (double) (Math.random()*1000);
-		Double totale = segno*somma;	
-		if(totale>=0) {
-			
-		}else {
-			
-		}
-		return ResponseEntity.status(null).body(null);
+		tavoloServiceInstance.aggiungiEdAggiornaPlayerAlTavolo(utente, tavolo);
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(result + " Il credito residuo è pari a: " + utente.getCreditoAccumulato());
 	}
 }

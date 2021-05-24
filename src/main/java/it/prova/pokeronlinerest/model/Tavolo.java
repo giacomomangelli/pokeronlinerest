@@ -18,16 +18,21 @@ import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.lang3.builder.EqualsExclude;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import it.prova.pokeronlinerest.validator.InsertTavoloValid;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(value = {"hibernateLazyInitializer"}, ignoreUnknown = true)
 @Entity
 @Table(name = "tavolo")
 @Data
@@ -35,6 +40,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 public class Tavolo {
 
 	@Id
@@ -42,17 +48,17 @@ public class Tavolo {
 	@Column(name = "id")
 	private Long id;
 
-	@NotNull(message = "{esperienzaMin.notnull}")
+	@NotNull(message = "{esperienzaMin.notnull}", groups = InsertTavoloValid.class)
 	@DecimalMin("0.0")
 	@Column(name = "esperienza_min")
 	private Double esperienzaMin;
 
-	@NotNull(message = "{cifraMinima.notnull}")
+	@NotNull(message = "{cifraMinima.notnull}", groups = InsertTavoloValid.class)
 	@DecimalMin("0.0")
 	@Column(name = "cifra_minima")
 	private Double cifraMinima;
 
-	@NotBlank(message = "{denominazione.notblank}")
+	@NotBlank(message = "{denominazione.notblank}", groups = InsertTavoloValid.class)
 	@Column(name = "denominazione")
 	private String denominazione;
 
@@ -60,14 +66,16 @@ public class Tavolo {
 	@Column(name = "data_creazione")
 	private Date dataCreazione;
 
-	@JsonIgnoreProperties(value = { "tavolo" })
-	@NotNull(message = "{utenteCreazione.notnull}")
+	@JsonIgnoreProperties(value = { "tavolo", "ruoli" })
+	@NotNull(message = "{utenteCreazione.notnull}", groups = InsertTavoloValid.class)
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "utente_creazione_id")
 	private Utente utenteCreazione;
 
-	@JsonIgnoreProperties(value = { "tavolo" })
+	@JsonIgnoreProperties(value = { "tavolo" , "ruoli" })
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "tavolo")
+	@JsonInclude(JsonInclude.Include.NON_EMPTY)
+	@EqualsExclude
 	private Set<Utente> utenti = new HashSet<>(0);
 
 }

@@ -10,7 +10,7 @@ public class CheckUtenteAuthorization {
 
 	public static void checkAuthorizationAdmin(String username, Utente utenteAuth) {
 		if(utenteAuth == null) {
-			throw new UtenteNotFoundException("Utente not found in session");
+			throw new UtenteNotFoundException("Utente not found in session con username: " + username);
 		}
 		if(!utenteAuth.isAdmin()) {
 			throw new UtenteNotAuthorizedException("Utente non autorizzato con username: " + username);

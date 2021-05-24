@@ -35,6 +35,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(value = {"hibernateLazyInitializer"}, ignoreUnknown = true)
 @Entity
 @Table(name = "utente")
 @Data
@@ -42,12 +43,13 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Utente {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
+	@EqualsAndHashCode.Include
 	private Long id;
 
 	@NotBlank(message = "{nome.notblank}", groups = InsertUtenteValid.class)

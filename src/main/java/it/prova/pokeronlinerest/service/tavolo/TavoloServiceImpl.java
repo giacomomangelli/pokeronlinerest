@@ -1,5 +1,6 @@
 package it.prova.pokeronlinerest.service.tavolo;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class TavoloServiceImpl implements TavoloService {
 	private TavoloRepository repository;
 	@Autowired
 	private UtenteService utenteServiceInstance;
-	
+
 	@Transactional(readOnly = true)
 	public List<Tavolo> listAllTavoli() {
 		return (List<Tavolo>) repository.findAll();
@@ -37,6 +38,7 @@ public class TavoloServiceImpl implements TavoloService {
 
 	@Transactional
 	public Tavolo inserisci(Tavolo tavoloInstance) {
+		tavoloInstance.setDataCreazione(new Date());
 		return repository.save(tavoloInstance);
 	}
 
@@ -58,14 +60,14 @@ public class TavoloServiceImpl implements TavoloService {
 	@Transactional(readOnly = true)
 	public Tavolo caricaTavoloByAuthorization(Utente utente, Long idTavolo) {
 		Utente utenteAuth = utenteServiceInstance.caricaSingoloUtenteEager(utente.getId());
-		if(utenteAuth.isPlayer()) {
+		if (utenteAuth.isPlayer()) {
 			throw new UtenteNotAuthorizedException("Utente not authorized for displaying table with id: " + idTavolo);
 		}
 		Tavolo tavolo = repository.findByIdEager(idTavolo);
-		if(utenteAuth.isAdmin()) {
+		if (utenteAuth.isAdmin()) {
 			return tavolo;
-		} else if(utente.isSpecialPlayer() && tavolo.getUtenteCreazione().equals(utente)) {
-			return tavolo;			
+		} else if (utente.isSpecialPlayer() && tavolo.getUtenteCreazione().equals(utente)) {
+			return tavolo;
 		} else {
 			throw new UtenteNotAuthorizedException("Utente not authorized for displaying table with id: " + idTavolo);
 		}
@@ -76,5 +78,17 @@ public class TavoloServiceImpl implements TavoloService {
 	public Tavolo caricaTavoloByUtenteCreazione(Long id, Utente utente) {
 		return repository.findByIdAndUtenteCreazione(id, utente).orElse(null);
 	}
-	
+
+	@Transactional
+	public Tavolo aggiungiEdAggiornaPlayerAlTavolo(Utente utente, Tavolo tavolo) {
+		if (utente.getTavolo()!= null && utente.getTavolo().equals(tavolo)) {
+			utenteServiceInstance.aggiorna(utente);
+			return tavolo;
+		}
+		tavolo.getUtenti().add(utente);
+		utente.setTavolo(tavolo);
+		utenteServiceInstance.aggiorna(utente);
+		return aggiorna(tavolo);
+	}
+
 }

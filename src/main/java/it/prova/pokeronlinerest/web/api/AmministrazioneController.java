@@ -32,13 +32,14 @@ public class AmministrazioneController {
 	private UtenteService utenteServiceInstance;
 
 	@GetMapping
-	public List<Utente> listAll(@RequestHeader ("Authorization") String message) {
+	public List<Utente> listAll(@RequestHeader("Authorization") String message) {
 		CheckUtenteAuthorization.checkAuthorizationAdmin(message, utenteServiceInstance.findByUserName(message));
 		return utenteServiceInstance.listAllUtenti();
 	}
 
 	@GetMapping("/{id}")
-	public Utente findById(@PathVariable(value = "id", required = true) Long id, @RequestHeader ("Authorization") String message) {
+	public Utente findById(@PathVariable(value = "id", required = true) Long id,
+			@RequestHeader("Authorization") String message) {
 		CheckUtenteAuthorization.checkAuthorizationAdmin(message, utenteServiceInstance.findByUserName(message));
 		Utente utente = utenteServiceInstance.caricaSingoloUtenteEager(id);
 		if (utente == null) {
@@ -49,16 +50,18 @@ public class AmministrazioneController {
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public Utente createNewUtente(@Valid @RequestBody Utente utenteInstance, @RequestHeader ("Authorization") String message) {
+	public Utente createNewUtente(@Valid @RequestBody Utente utenteInstance,
+			@RequestHeader("Authorization") String message) {
 		CheckUtenteAuthorization.checkAuthorizationAdmin(message, utenteServiceInstance.findByUserName(message));
 		utenteInstance.setDataRegistrazione(new Date());
-		utenteInstance.setStato(StatoUtente.ATTIVO);;
+		utenteInstance.setStato(StatoUtente.ATTIVO);
+		;
 		return utenteServiceInstance.inserisci(utenteInstance);
 	}
 
 	@PutMapping("/{id}")
 	public Utente updateUtente(@PathVariable(value = "id", required = true) Long id,
-			@Valid @RequestBody Utente utenteInstance, @RequestHeader ("Authorization") String message) {
+			@Valid @RequestBody Utente utenteInstance, @RequestHeader("Authorization") String message) {
 
 		CheckUtenteAuthorization.checkAuthorizationAdmin(message, utenteServiceInstance.findByUserName(message));
 		Utente utente = utenteServiceInstance.caricaSingoloUtenteEager(id);
@@ -72,7 +75,8 @@ public class AmministrazioneController {
 
 	@DeleteMapping("/{id}")
 	@ResponseStatus(HttpStatus.OK)
-	public void deleteUtente(@PathVariable(value = "id", required = true) Long id, @RequestHeader ("Authorization") String message) {
+	public void deleteUtente(@PathVariable(value = "id", required = true) Long id,
+			@RequestHeader("Authorization") String message) {
 		CheckUtenteAuthorization.checkAuthorizationAdmin(message, utenteServiceInstance.findByUserName(message));
 		Utente utente = utenteServiceInstance.caricaSingoloUtente(id);
 		if (utente == null) {
@@ -82,7 +86,7 @@ public class AmministrazioneController {
 	}
 
 	@PostMapping("/search")
-	public List<Utente> searchUtente(Utente utenteExample, @RequestHeader ("Authorization") String message) {
+	public List<Utente> searchUtente(Utente utenteExample, @RequestHeader("Authorization") String message) {
 		CheckUtenteAuthorization.checkAuthorizationAdmin(message, utenteServiceInstance.findByUserName(message));
 		return utenteServiceInstance.findByExample(utenteExample);
 	}

@@ -52,8 +52,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 		return handleExceptionInternal(ex, body, new HttpHeaders(), HttpStatus.FORBIDDEN, request);
 	}
 
-	@ExceptionHandler(value = { CreditInvalidException.class })
-	protected ResponseEntity<Object> handleCredit(RuntimeException ex, WebRequest request) {
+	@ExceptionHandler(value = { CreditInvalidException.class, OperationDeniedException.class, ExperienceInvalidException.class })
+	protected ResponseEntity<Object> handleOperations(RuntimeException ex, WebRequest request) {
 		Map<String, Object> body = new LinkedHashMap<>();
 		body.put("timestamp", new Date());
 		body.put("status", HttpStatus.METHOD_NOT_ALLOWED);

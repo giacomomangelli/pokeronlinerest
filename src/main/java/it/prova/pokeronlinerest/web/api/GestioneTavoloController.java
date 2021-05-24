@@ -6,6 +6,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +23,8 @@ import it.prova.pokeronlinerest.model.Utente;
 import it.prova.pokeronlinerest.service.tavolo.TavoloService;
 import it.prova.pokeronlinerest.service.utente.UtenteService;
 import it.prova.pokeronlinerest.utility.CheckUtenteAuthorization;
+import it.prova.pokeronlinerest.validator.InsertTavoloValid;
+import it.prova.pokeronlinerest.web.api.exception.OperationDeniedException;
 import it.prova.pokeronlinerest.web.api.exception.TavoloNotFoundException;
 import it.prova.pokeronlinerest.web.api.exception.UtenteNotAuthorizedException;
 
@@ -35,12 +38,14 @@ public class GestioneTavoloController {
 	private UtenteService utenteServiceInstance;
 
 	@GetMapping
-	public List<Tavolo> listAllTavoli(@RequestHeader("Authorization") String message) {
+	@ResponseStatus(HttpStatus.OK)
+	public List<Tavolo> listTavoli(@RequestHeader("Authorization") String message) {
 		CheckUtenteAuthorization.checkAuthorizationAdmin(message, utenteServiceInstance.findByUserName(message));
 		return tavoloServiceInstance.listAllTavoli();
 	}
 
 	@GetMapping("/{id}")
+	@ResponseStatus(HttpStatus.OK)
 	public Tavolo findById(@PathVariable(value = "id", required = true) Long id,
 			@RequestHeader("Authorization") String message) {
 		Utente utente = utenteServiceInstance.findByUserName(message);
@@ -54,7 +59,7 @@ public class GestioneTavoloController {
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public Tavolo createNewTavolo(@Valid @RequestBody Tavolo tavoloInstance,
+	public Tavolo createNewTavolo(@Validated(InsertTavoloValid.class) @RequestBody Tavolo tavoloInstance,
 			@RequestHeader("Authorization") String message) {
 		CheckUtenteAuthorization.checkAuthorizationAdminOrSpecialPlayer(message,
 				utenteServiceInstance.findByUserName(message));
@@ -62,6 +67,7 @@ public class GestioneTavoloController {
 	}
 
 	@PutMapping("/{id}")
+	@ResponseStatus(HttpStatus.OK)
 	public Tavolo updateTavolo(@PathVariable Long id, @Valid @RequestBody Tavolo tavoloInstance,
 			@RequestHeader("Authorization") String message) {
 		Utente utente = utenteServiceInstance.findByUserName(message);
@@ -70,16 +76,20 @@ public class GestioneTavoloController {
 		if (tavolo == null) {
 			throw new TavoloNotFoundException("Tavolo not found " + id);
 		}
+		if (!tavolo.getUtenti().isEmpty()) {
+			throw new OperationDeniedException("Vi sono ancora utenti attivi nel tavolo");
+		}
 //		if (utente.isSpecialPlayer() && !tavolo.getUtenteCreazione().equals(utente)) {
 //			throw new UtenteNotAuthorizedException("Utente not authorized with id: " + utente.getId());
 //		}
 		CheckUtenteAuthorization.checkAthorizationOfSpecialPlayerWithTable(message, utente, tavolo);
-		
+
 		tavoloInstance.setId(id);
 		return tavoloServiceInstance.aggiorna(tavoloInstance);
 	}
 
 	@DeleteMapping("/{id}")
+	@ResponseStatus(HttpStatus.OK)
 	public void deleteTavolo(@PathVariable Long id, @RequestHeader("Authorization") String message) {
 		Utente utente = utenteServiceInstance.findByUserName(message);
 		CheckUtenteAuthorization.checkAuthorizationAdminOrSpecialPlayer(message, utente);
@@ -87,21 +97,26 @@ public class GestioneTavoloController {
 		if (tavolo == null) {
 			throw new TavoloNotFoundException("Tavolo not found " + id);
 		}
-		if(utente.isSpecialPlayer() && tavoloServiceInstance.caricaTavoloByUtenteCreazione(id, utente)==null) {
+		if (!tavolo.getUtenti().isEmpty()) {
+			throw new OperationDeniedException("Impossibile eliminare! Vi sono ancora utenti attivi nel tavolo");
+		}
+		if (utente.isSpecialPlayer() && tavoloServiceInstance.caricaTavoloByUtenteCreazione(id, utente) == null) {
 			throw new UtenteNotAuthorizedException("Utente not authorized with id: " + utente.getId());
 		}
 		tavoloServiceInstance.rimuovi(tavolo);
 	}
-	
+
 	@PostMapping("/search")
-	public List<Tavolo> searchTavolo(@RequestHeader("Authorization") String message, @RequestBody Tavolo tavoloExample){
+	@ResponseStatus(HttpStatus.OK)
+	public List<Tavolo> searchTavolo(@RequestHeader("Authorization") String message,
+			@RequestBody Tavolo tavoloExample) {
 		Utente utente = utenteServiceInstance.findByUserName(message);
-		if(utente.isAdmin()) {
+		if (utente.isAdmin()) {
 			return tavoloServiceInstance.findByExample(tavoloExample);
 		}
 		CheckUtenteAuthorization.checkAthorizationOfSpecialPlayerWithTable(message, utente, tavoloExample);
 		tavoloExample.setUtenteCreazione(utente);
 		return tavoloServiceInstance.findByExample(tavoloExample);
 	}
-	
+
 }
