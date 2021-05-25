@@ -67,6 +67,10 @@ public class Utente {
 	@NotBlank(message = "{password.notblank}", groups = InsertUtenteValid.class)
 	@Column(name = "password")
 	private String password;
+	
+	@NotBlank(message = "{email.notblank}", groups = InsertUtenteValid.class)
+	@Column(name = "email")
+	private String email;
 
 	@NotNull(message = "{dataRegistrazione.notnull}")
 	@Column(name = "data_registrazione")
@@ -128,17 +132,21 @@ public class Utente {
 		return false;
 	}
 
-	public Utente(@NotBlank(message = "{nome.notblank}") String nome,
-			@NotBlank(message = "{cognome.notblank}") String cognome,
-			@NotBlank(message = "{username.notblank}") String username,
-			@NotBlank(message = "{password.notblank}") String password,
+	public Utente(@NotBlank(message = "{nome.notblank}", groups = InsertUtenteValid.class) String nome,
+			@NotBlank(message = "{cognome.notblank}", groups = InsertUtenteValid.class) String cognome,
+			@NotBlank(message = "{username.notblank}", groups = InsertUtenteValid.class) String username,
+			@NotBlank(message = "{password.notblank}", groups = InsertUtenteValid.class) String password,
+			@NotBlank(message = "{email.notblank}", groups = InsertUtenteValid.class) String email,
 			@NotNull(message = "{dataRegistrazione.notnull}") Date dataRegistrazione) {
 		super();
 		this.nome = nome;
 		this.cognome = cognome;
 		this.username = username;
 		this.password = password;
+		this.email = email;
 		this.dataRegistrazione = dataRegistrazione;
 	}
+	
+	
 
 }

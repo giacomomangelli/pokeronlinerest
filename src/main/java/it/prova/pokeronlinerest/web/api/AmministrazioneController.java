@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 import it.prova.pokeronlinerest.model.StatoUtente;
 import it.prova.pokeronlinerest.model.Utente;
 import it.prova.pokeronlinerest.service.utente.UtenteService;
-import it.prova.pokeronlinerest.utility.CheckUtenteAuthorization;
 import it.prova.pokeronlinerest.web.api.exception.UtenteNotFoundException;
 
 @RestController
@@ -32,15 +31,13 @@ public class AmministrazioneController {
 	private UtenteService utenteServiceInstance;
 
 	@GetMapping
-	public List<Utente> listAll(@RequestHeader("Authorization") String message) {
-		CheckUtenteAuthorization.checkAuthorizationAdmin(message, utenteServiceInstance.findByUserName(message));
+	public List<Utente> listAll() {
 		return utenteServiceInstance.listAllUtenti();
 	}
 
 	@GetMapping("/{id}")
 	public Utente findById(@PathVariable(value = "id", required = true) Long id,
 			@RequestHeader("Authorization") String message) {
-		CheckUtenteAuthorization.checkAuthorizationAdmin(message, utenteServiceInstance.findByUserName(message));
 		Utente utente = utenteServiceInstance.caricaSingoloUtenteEager(id);
 		if (utente == null) {
 			throw new UtenteNotFoundException("Utente not found with id: " + id);
@@ -50,9 +47,7 @@ public class AmministrazioneController {
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public Utente createNewUtente(@Valid @RequestBody Utente utenteInstance,
-			@RequestHeader("Authorization") String message) {
-		CheckUtenteAuthorization.checkAuthorizationAdmin(message, utenteServiceInstance.findByUserName(message));
+	public Utente createNewUtente(@Valid @RequestBody Utente utenteInstance) {
 		utenteInstance.setDataRegistrazione(new Date());
 		utenteInstance.setStato(StatoUtente.ATTIVO);
 		;
@@ -61,9 +56,7 @@ public class AmministrazioneController {
 
 	@PutMapping("/{id}")
 	public Utente updateUtente(@PathVariable(value = "id", required = true) Long id,
-			@Valid @RequestBody Utente utenteInstance, @RequestHeader("Authorization") String message) {
-
-		CheckUtenteAuthorization.checkAuthorizationAdmin(message, utenteServiceInstance.findByUserName(message));
+			@Valid @RequestBody Utente utenteInstance) {
 		Utente utente = utenteServiceInstance.caricaSingoloUtenteEager(id);
 		if (utente == null) {
 			throw new UtenteNotFoundException("Utente not found with id: " + id);
@@ -75,9 +68,7 @@ public class AmministrazioneController {
 
 	@DeleteMapping("/{id}")
 	@ResponseStatus(HttpStatus.OK)
-	public void deleteUtente(@PathVariable(value = "id", required = true) Long id,
-			@RequestHeader("Authorization") String message) {
-		CheckUtenteAuthorization.checkAuthorizationAdmin(message, utenteServiceInstance.findByUserName(message));
+	public void deleteUtente(@PathVariable(value = "id", required = true) Long id) {
 		Utente utente = utenteServiceInstance.caricaSingoloUtente(id);
 		if (utente == null) {
 			throw new UtenteNotFoundException("Utente not found with id: " + id);
@@ -86,8 +77,7 @@ public class AmministrazioneController {
 	}
 
 	@PostMapping("/search")
-	public List<Utente> searchUtente(Utente utenteExample, @RequestHeader("Authorization") String message) {
-		CheckUtenteAuthorization.checkAuthorizationAdmin(message, utenteServiceInstance.findByUserName(message));
+	public List<Utente> searchUtente(Utente utenteExample) {
 		return utenteServiceInstance.findByExample(utenteExample);
 	}
 

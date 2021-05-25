@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import it.prova.pokeronlinerest.model.Ruolo;
 import it.prova.pokeronlinerest.model.StatoUtente;
@@ -20,6 +21,8 @@ public class PokeronlinerestApplication implements CommandLineRunner{
 	private RuoloService ruoloServiceInstance;
 	@Autowired
 	private UtenteService utenteServiceInstance;
+	@Autowired
+	PasswordEncoder passwordEncoder;
 
 	public static void main(String[] args) {
 		SpringApplication.run(PokeronlinerestApplication.class, args);
@@ -41,7 +44,7 @@ public class PokeronlinerestApplication implements CommandLineRunner{
 		}
 
 		if (utenteServiceInstance.findByUserName("admin") == null) {
-			Utente admin = new Utente("Mario", "Rossi", "admin", "admin", new Date());
+			Utente admin = new Utente("Mario", "Rossi", "admin", passwordEncoder.encode("admin"), "giacomo.mang@tiscali.it" ,new Date());
 			admin.getRuoli().add(ruoloServiceInstance.cercaPerDescrizioneECodice("Administrator", "ROLE_ADMIN"));
 			admin.setStato(StatoUtente.ATTIVO);
 			admin.setCreditoAccumulato(0.0);

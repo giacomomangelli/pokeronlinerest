@@ -39,8 +39,7 @@ public class GestioneTavoloController {
 
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public List<Tavolo> listTavoli(@RequestHeader("Authorization") String message) {
-		CheckUtenteAuthorization.checkAuthorizationAdmin(message, utenteServiceInstance.findByUserName(message));
+	public List<Tavolo> listTavoli() {
 		return tavoloServiceInstance.listAllTavoli();
 	}
 
