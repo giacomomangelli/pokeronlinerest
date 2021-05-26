@@ -1,12 +1,8 @@
 package it.prova.pokeronlinerest.security.service;
 
-import java.util.Collection;
-
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -31,12 +27,6 @@ public class JwtUserDetailsServiceImpl implements UserDetailsService {
 
 		return JwtUserDetailsImpl.build(user);
 
-	}
-
-	public static Collection<GrantedAuthority> getAuthorities(Utente user) {
-		String[] userRoles = user.getRuoli().stream().map((role) -> role.getCodice()).toArray(String[]::new);
-		Collection<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(userRoles);
-		return authorities;
 	}
 
 }

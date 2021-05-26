@@ -4,13 +4,13 @@ import java.util.Collection;
 import java.util.Objects;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import it.prova.pokeronlinerest.model.StatoUtente;
 import it.prova.pokeronlinerest.model.Utente;
-import it.prova.pokeronlinerest.security.service.JwtUserDetailsServiceImpl;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,7 +34,7 @@ public class JwtUserDetailsImpl implements UserDetails {
 	}
 	
 	public static JwtUserDetailsImpl build(Utente user) {
-		Collection<GrantedAuthority> authorities = JwtUserDetailsServiceImpl.getAuthorities(user);
+		Collection<GrantedAuthority> authorities = getAuthorities(user);
 		
         return new JwtUserDetailsImpl(
                 user.getUsername(),
@@ -44,6 +44,12 @@ public class JwtUserDetailsImpl implements UserDetails {
                 user.getStato()
         );
     }
+	
+	private static Collection<GrantedAuthority> getAuthorities(Utente user) {
+		String[] userRoles = user.getRuoli().stream().map((role) -> role.getCodice()).toArray(String[]::new);
+		Collection<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(userRoles);
+		return authorities;
+	}
 
 	@JsonIgnore
 	@Override
