@@ -22,7 +22,7 @@ public class PokeronlinerestApplication implements CommandLineRunner{
 	@Autowired
 	private UtenteService utenteServiceInstance;
 	@Autowired
-	PasswordEncoder passwordEncoder;
+	private PasswordEncoder passwordEncoder;
 
 	public static void main(String[] args) {
 		SpringApplication.run(PokeronlinerestApplication.class, args);

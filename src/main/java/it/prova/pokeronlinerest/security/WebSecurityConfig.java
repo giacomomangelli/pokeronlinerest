@@ -71,11 +71,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         httpSecurity
         		.cors().and().csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-                // non abbiamo bisogno di una sessione
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
                 .antMatchers(
-                        //HttpMethod.GET,
                         "/",
                         "/*.html",
                         "/favicon.ico",
@@ -84,7 +82,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.js"
                 ).permitAll()
                 .antMatchers("/public/**").permitAll()
-                .antMatchers("/api/play/**").hasAnyAuthority()
+                .antMatchers("/api/play/**").hasAnyRole()
                 .antMatchers("/api/tavolo/**").hasAnyAuthority("ROLE_SPECIAL_PLAYER", "ROLE_ADMIN")
                 .antMatchers("/api/amministrazione/**").hasAnyAuthority("ROLE_ADMIN")
                 .anyRequest().authenticated();
