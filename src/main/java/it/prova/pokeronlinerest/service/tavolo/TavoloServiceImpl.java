@@ -91,4 +91,9 @@ public class TavoloServiceImpl implements TavoloService {
 		return aggiorna(tavolo);
 	}
 
+	@Transactional(readOnly = true)
+	public List<Tavolo> listAllTavoliByUtenteCreazione(Utente utente) {
+		return repository.findByUtenteCreazione(utente);
+	}
+
 }

@@ -67,7 +67,7 @@ public class Tavolo {
 	private Date dataCreazione;
 
 	@JsonIgnoreProperties(value = { "tavolo", "ruoli" })
-	@NotNull(message = "{utenteCreazione.notnull}", groups = InsertTavoloValid.class)
+	@NotNull(message = "{utenteCreazione.notnull}")
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "utente_creazione_id")
 	private Utente utenteCreazione;

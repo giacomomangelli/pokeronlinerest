@@ -82,7 +82,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.js"
                 ).permitAll()
                 .antMatchers("/public/**").permitAll()
-                .antMatchers("/api/play/**").hasAnyRole()
+                .antMatchers("/api/play/**").hasAnyAuthority("ROLE_SPECIAL_PLAYER", "ROLE_ADMIN", "ROLE_PLAYER")
                 .antMatchers("/api/tavolo/**").hasAnyAuthority("ROLE_SPECIAL_PLAYER", "ROLE_ADMIN")
                 .antMatchers("/api/amministrazione/**").hasAnyAuthority("ROLE_ADMIN")
                 .anyRequest().authenticated();

@@ -1,5 +1,6 @@
 package it.prova.pokeronlinerest.repository.tavolo;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
@@ -14,5 +15,7 @@ public interface TavoloRepository extends CrudRepository<Tavolo, Long>, CustomTa
 	Tavolo findByIdEager(Long id);
 	
 	Optional<Tavolo> findByIdAndUtenteCreazione(Long id, Utente utenteCreazione);
+	
+	List<Tavolo> findByUtenteCreazione(Utente utenteCreazione);
 
 }

@@ -25,6 +25,8 @@ public interface TavoloService {
 	
 	public Tavolo caricaTavoloByUtenteCreazione(Long id, Utente utente);
 	
+	public List<Tavolo> listAllTavoliByUtenteCreazione(Utente utente);
+	
 	public Tavolo aggiungiEdAggiornaPlayerAlTavolo(Utente utente, Tavolo tavolo);
 	
 }
