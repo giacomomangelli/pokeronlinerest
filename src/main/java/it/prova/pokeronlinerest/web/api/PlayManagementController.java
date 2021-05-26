@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import it.prova.pokeronlinerest.model.Tavolo;
 import it.prova.pokeronlinerest.model.Utente;
 import it.prova.pokeronlinerest.security.jwt.JwtTokenUtil;
+import it.prova.pokeronlinerest.service.PlayService;
 import it.prova.pokeronlinerest.service.tavolo.TavoloService;
 import it.prova.pokeronlinerest.service.utente.UtenteService;
 import it.prova.pokeronlinerest.web.api.exception.CreditInvalidException;
@@ -31,6 +32,8 @@ public class PlayManagementController {
 	private UtenteService utenteServiceInstance;
 	@Autowired
 	private TavoloService tavoloServiceInstance;
+	@Autowired
+	private PlayService playService;
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
 
@@ -99,22 +102,16 @@ public class PlayManagementController {
 		}
 
 		String result = "La partita è stata ";
-		Double segno = Math.random();
-
-		if (segno >= 0.5) {
-			segno = 1D;
-		} else {
-			segno = -1D;
-		}
-		Double somma = (double) (Math.random() * 1000);
-		Double totale = segno * somma;
-		if (totale >= 0) {
+		
+		Double risultatoPartita = playService.play();
+		
+		if (risultatoPartita >= 0) {
 			result += "vinta.";
 		} else {
 			result += "persa.";
 		}
 
-		utente.setCreditoAccumulato(utente.getCreditoAccumulato() + totale);
+		utente.setCreditoAccumulato(utente.getCreditoAccumulato() + risultatoPartita);
 
 		if (utente.getCreditoAccumulato() < 0) {
 			utente.setTavolo(null);
