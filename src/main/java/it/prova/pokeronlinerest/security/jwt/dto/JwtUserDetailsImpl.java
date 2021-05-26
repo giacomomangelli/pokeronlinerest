@@ -97,6 +97,9 @@ public class JwtUserDetailsImpl implements UserDetails {
 
 	@Override
 	public boolean isEnabled() {
+		if(getStato()==null) {
+			return false;
+		}
 		return getStato().equals(StatoUtente.ATTIVO)?true:false;
 	}
 
